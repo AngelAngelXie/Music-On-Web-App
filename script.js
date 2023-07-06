@@ -46,22 +46,38 @@ function clearResult() {
 
 //spits out search results
 async function spitResult() {
-  //key & API
-  let authKey = "b46b55Gk91lJS1IpOW8Qzr8v4dX3ThhwNcTArX9OzJiT8Q5qjTov0ucT";
-  let myApi = `https://api.happi.dev/v1/music?q=${input.value}&limit=&apikey=${authKey}&type=:type&lyrics=1`;
-  // console.log(myApi);
-
-  // fetch songs from API, convert to json
-  let result = await fetch(myApi);
-  const songJson = await result.json();
-  // console.log(songJson);
-  queryJson = songJson;
-  //console.log(queryJson)
-  console.log(queryJson);
+  // // previous key & API
+  // let authKey = "b46b55Gk91lJS1IpOW8Qzr8v4dX3ThhwNcTArX9OzJiT8Q5qjTov0ucT";
+  // let myApi = `https://api.happi.dev/v1/music?q=${input.value}&limit=&apikey=${authKey}&type=:type&lyrics=1`;
+  // // console.log(myApi);
+  //   // fetch songs from API, convert to json
+  //   let result = await fetch(myApi);
+  //   const songJson = await result.json();
+  //   // console.log(songJson);
+  //   queryJson = songJson;
+  //   //console.log(queryJson)
+  //   console.log(queryJson);
+  
+  const url = `https://genius-song-lyrics1.p.rapidapi.com/search/?q=${input.value}&per_page=12&page=1`;
+  const options = {
+    method: 'GET',
+    headers: {
+      'X-RapidAPI-Key': 'c6a644ac67mshf2a9ee8378a98fdp1048d3jsn58314285c447',
+      'X-RapidAPI-Host': 'genius-song-lyrics1.p.rapidapi.com'
+    }
+  };
+  
+  try {
+    const result = await fetch(url, options);
+    const songJson = await result.json();
+    queryJson = songJson;
+  } catch (error) {
+    console.error(error);
+  }
 
   //adding cards to result by appending :)
   var songCount = 0;
-  var arr = songJson.result;
+  var arr = queryJson.hits;
   for (let i = 0; i < arr.length; i++) {
     console.log(arr[i]);
     //add div
@@ -79,20 +95,20 @@ async function spitResult() {
     var fig = document.createElement('figure');
     fig.classList.add('image');
     var img = document.createElement('img');
-    img.setAttribute('src', arr[i].cover);
+    img.setAttribute('src', arr[i].result.header_image_thumbnail_url);
     fig.append(img);
 
     //add title
     var title = document.createElement('div');
     title.classList.add("content");
     title.classList.add("songName");
-    title.innerText = arr[i].track;
+    title.innerText = arr[i].result.title;
 
     //add author
     var artist = document.createElement('div');
     artist.classList.add("content");
     artist.classList.add("artist");
-    artist.innerText = arr[i].artist;
+    artist.innerText = arr[i].result.artist_names;
 
     //grab the holder for all the cards & append everything to holder
     var holder = document.getElementById('result-list');
