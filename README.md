@@ -1,5 +1,4 @@
-# Music-On-Web-App
-
+# 🪩 Music-On-Web-App 🪩
 2022 Google Computer Science Summer Institute Final Project
 
 Built by Angel Xie, Kirsten Szeto, & Bryce Davis
