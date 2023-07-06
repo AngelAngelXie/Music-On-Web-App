@@ -9,7 +9,6 @@ let lyricN = document.querySelector("#lyricArea");
 let ebArea = document.querySelector("#ebPlay");
 let playPause = document.querySelector("#playbutton");
 let vid = document.getElementById("music-video");
-// let playableVid = document.getElementById("ebPlay");
 let playButton = document.querySelector("#playB");
 
 // pulling from local storage
@@ -22,7 +21,15 @@ let coverT = JSON.parse(myCover);
 
 let searchKey = st + " " + artistT;
 
-//------------------------------------------------
+const options = {
+  method: 'GET',
+  headers: {
+    'X-RapidAPI-Key': 'c6a644ac67mshf2a9ee8378a98fdp1048d3jsn58314285c447',
+    'X-RapidAPI-Host': 'genius-song-lyrics1.p.rapidapi.com'
+  }
+};
+
+// //------------------------------------------------
 
 // getting lyrics
 async function getLyrics() {
@@ -30,11 +37,12 @@ async function getLyrics() {
   let path = JSON.parse(myLyr);
 
   // fetch song lyrics from API
-  let r = await fetch(path);
+  lyricN.innerHTML = "Loading...";
+  let r = await fetch(path, options);
   const lyrJson = await r.json();
-  let lyrics = lyrJson.result.lyrics;
-  //console.log("fetching songs from api...... \n" + lyrJson.result);
-  //console.log("These are the lyrics: " + lyrics);
+  let lyrics = lyrJson.lyrics.lyrics.body.html;
+  console.log(lyrJson);
+  console.log(lyrics);
   lyricN.innerHTML = lyrics;
 }
 getLyrics();
@@ -47,23 +55,28 @@ function getInfo() {
 }
 getInfo();
 
-//------------------------------------------------------------------------------------------------------------------
-//-----------------------------------------------------Video Stuff--------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------
+// //------------------------------------------------------------------------------------------------------------------
+// //-----------------------------------------------------Video Stuff--------------------------------------------------
+// //------------------------------------------------------------------------------------------------------------------
 //getting youtube video
 async function ytResult() {
-  const options = {
+  const opts = {
     method: 'GET',
     headers: {
       'X-RapidAPI-Key': '37749dd7e3msh939061c0790b14ap12fd49jsnf4e036dcb678',
       'X-RapidAPI-Host': 'ytube-videos.p.rapidapi.com'
     }
   };
-  let result = await fetch(`https://ytube-videos.p.rapidapi.com/search-video?q=${searchKey}`, options);
-  const ytJson = await result.json();
-  const ytLink = await ytJson[0].link;
-  vidId = ytJson[0].id
-  newYtLink = ytLink.replace('watch?v=', "embed/");
+  try{
+    let result = await fetch(`https://ytube-videos.p.rapidapi.com/search-video?q=${searchKey}`, opts);
+    const ytJson = await result.json();
+    const ytLink = await ytJson[0].link;
+    vidId = ytJson[0].id
+    newYtLink = ytLink.replace('watch?v=', "embed/");
+  } catch (error){
+    console.error(error);
+  }
+  
 }
 ytResult();
 
@@ -74,9 +87,9 @@ function playB() {
   storeLink = newYtLink;
 };
 
-// //------------------------------------------------------------------------------------------------------------------
-// //-------------------------------------------- (: PLAYLIST STUFF :) ------------------------------------------------
-// //------------------------------------------------------------------------------------------------------------------
+// // //------------------------------------------------------------------------------------------------------------------
+// // //-------------------------------------------- (: PLAYLIST STUFF :) ------------------------------------------------
+// // //------------------------------------------------------------------------------------------------------------------
 let personalPlayList = loadMyPlayList();
 
 

@@ -9,7 +9,6 @@ let resultSection = document.querySelector("#resultC");
 let thePlayList = document.querySelector("#liked-list");
 let musicVideo = document.querySelector('#mus-vid')
 let songInfo = [];
-
 let baseURl = `https://genius-song-lyrics1.p.rapidapi.com`;
 const options = {
   method: 'GET',
@@ -18,7 +17,6 @@ const options = {
     'X-RapidAPI-Host': 'genius-song-lyrics1.p.rapidapi.com'
   }
 };
-
 //-----------------------------------------------------------------------------------------------------
 //------------------------------------SEARCH BAR & RESULT DISPLAY--------------------------------------
 //-----------------------------------------------------------------------------------------------------
@@ -84,9 +82,6 @@ async function spitResult() {
     //add button
     var playb = document.createElement('div');
     playb.innerHTML = `<button class = "cardBtn" data-target="${songCount}">Get Lyrics!</i>`;
-    // onclick="location.href='lyrics.html';
-    // console.log(playb);
-    // playb.classList.add("hidden");
 
     //add img
     var fig = document.createElement('figure');
@@ -129,9 +124,9 @@ async function spitResult() {
   buttonClick();
 };
 
-//--------------------------------------------------------------------------------------------------
-//-----------------------------Selected card stored in local storage--------------------------------
-//--------------------------------------------------------------------------------------------------
+// //--------------------------------------------------------------------------------------------------
+// //-----------------------------Selected card stored in local storage--------------------------------
+// //--------------------------------------------------------------------------------------------------
 
 //store info
 function buttonClick() {
@@ -142,24 +137,16 @@ function buttonClick() {
       console.log("num is...." + num)
       var arr = queryJson.hits;
       console.log("test..." + arr)
-      // // outdated api stuff: get the lyrics
-      // let path = arr[num].api_lyrics;
-      // path += "?apikey=b46b55Gk91lJS1IpOW8Qzr8v4dX3ThhwNcTArX9OzJiT8Q5qjTov0ucT";
 
+      // songInfo
       let songID = arr[num].result.id;
       lyrPath = baseURl + `/song/lyrics/?id=${songID}`;
       saveInfo("lyrPath", lyrPath);
-
-      // songInfo
-      // title
-      saveInfo("songTitle", arr[num].track);
-      saveInfo("artistName", arr[num].artist);
-      saveInfo("coverArt", arr[num].cover);
-
-      //songInfo.push(createNewSong(arr[num].track, arr[num].cover, arr[num].artist));
-      //saveInfo();
+      saveInfo("songTitle", arr[num].result.title);
+      saveInfo("artistName", arr[num].result.artist_names);
+      saveInfo("coverArt", arr[num].result.header_image_thumbnail_url);
+      
       window.location.href = "lyrics.html";
-      //getInfo();
     })
   });
 };
@@ -170,9 +157,10 @@ function saveInfo(name, input) {
   window.localStorage.setItem(name, info);
 }
 
-//------------------------------------------------------------------------------------------------------------------
-//--------------------------------------Song Timeline Exploration Section-------------------------------------------
-//------------------------------------------------------------------------------------------------------------------
+
+// //------------------------------------------------------------------------------------------------------------------
+// //--------------------------------------Song Timeline Exploration Section-------------------------------------------
+// //------------------------------------------------------------------------------------------------------------------
 let musicT = document.querySelectorAll(".song-history-list");
 let keywords = ["White Christmas Bing Crosby", "We're Gonna Rock Around the Clock", "Hey Jude", "Bohemian Rhapsody", "Billie Jean Michael Jackson", "I Believe I Can Fly R. Kelly", "We Belong Together"];
 let playListInfo = [];
@@ -207,7 +195,7 @@ async function videoLoad(counter) {
     const ytLink = await ytJson[0].link;
     finytLink = ytLink.replace('watch?v=', "embed/");
     return finytLink;
-  }catch{
+  } catch(error) {
     console.error(error);
   }
   
@@ -216,7 +204,7 @@ async function videoLoad(counter) {
 //play music
 async function listenForHistoryPlay(m) {
   let playLink = await videoLoad(m);
-  finLink = playLink.concat("?start=80&autoplay=1");
+  finLink = playLink + "?start=80&autoplay=1";
   console.log(finLink);
   musicVideo.innerHTML = `<iframe class="hidden" src =${finLink} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>`;
 
@@ -227,10 +215,9 @@ async function listenForHistoryPlay(m) {
 }
 
 
-
-//------------------------------------------------------------------------------------------------------------------
-//------------------------------------------- Displaying Playlist :) -----------------------------------------------
-//------------------------------------------------------------------------------------------------------------------
+// //------------------------------------------------------------------------------------------------------------------
+// //------------------------------------------- Displaying Playlist :) -----------------------------------------------
+// //------------------------------------------------------------------------------------------------------------------
 let mPlayList = loadThePlayList();
 displayLikedSongs();
 
@@ -268,7 +255,6 @@ function displayLikedSongs() {
     </div>`;
     thePlayList.append(songDiv);
   }
-
 }
 
 
