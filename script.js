@@ -10,6 +10,15 @@ let thePlayList = document.querySelector("#liked-list");
 let musicVideo = document.querySelector('#mus-vid')
 let songInfo = [];
 
+let baseURl = `https://genius-song-lyrics1.p.rapidapi.com`;
+const options = {
+  method: 'GET',
+  headers: {
+    'X-RapidAPI-Key': 'c6a644ac67mshf2a9ee8378a98fdp1048d3jsn58314285c447',
+    'X-RapidAPI-Host': 'genius-song-lyrics1.p.rapidapi.com'
+  }
+};
+
 //-----------------------------------------------------------------------------------------------------
 //------------------------------------SEARCH BAR & RESULT DISPLAY--------------------------------------
 //-----------------------------------------------------------------------------------------------------
@@ -44,36 +53,24 @@ function clearResult() {
   exist.innerHTML = "";
 }
 
-//spits out search results
-async function spitResult() {
-  // // previous key & API
-  // let authKey = "b46b55Gk91lJS1IpOW8Qzr8v4dX3ThhwNcTArX9OzJiT8Q5qjTov0ucT";
-  // let myApi = `https://api.happi.dev/v1/music?q=${input.value}&limit=&apikey=${authKey}&type=:type&lyrics=1`;
-  // // console.log(myApi);
-  //   // fetch songs from API, convert to json
-  //   let result = await fetch(myApi);
-  //   const songJson = await result.json();
-  //   // console.log(songJson);
-  //   queryJson = songJson;
-  //   //console.log(queryJson)
-  //   console.log(queryJson);
+//api for basic info stuff
+async function fetchSong(input, count) {
   
-  const url = `https://genius-song-lyrics1.p.rapidapi.com/search/?q=${input.value}&per_page=12&page=1`;
-  const options = {
-    method: 'GET',
-    headers: {
-      'X-RapidAPI-Key': 'c6a644ac67mshf2a9ee8378a98fdp1048d3jsn58314285c447',
-      'X-RapidAPI-Host': 'genius-song-lyrics1.p.rapidapi.com'
-    }
-  };
-  
+  const url = baseURl + `/search/?q=${input}&per_page=${count}&page=1`;
   try {
     const result = await fetch(url, options);
     const songJson = await result.json();
-    queryJson = songJson;
+    return songJson;
   } catch (error) {
     console.error(error);
   }
+  
+}
+
+//spits out search results
+async function spitResult() {
+
+  queryJson = await fetchSong(input.value, 12);
 
   //adding cards to result by appending :)
   var songCount = 0;
@@ -143,16 +140,17 @@ function buttonClick() {
     button.addEventListener('click', async (e) => {
       let num = button.dataset.target; // number grabbed
       console.log("num is...." + num)
-      var arr = queryJson.result;
+      var arr = queryJson.hits;
       console.log("test..." + arr)
-      // get the lyrics
-      let path = arr[num].api_lyrics;
-      path += "?apikey=b46b55Gk91lJS1IpOW8Qzr8v4dX3ThhwNcTArX9OzJiT8Q5qjTov0ucT";
+      // // outdated api stuff: get the lyrics
+      // let path = arr[num].api_lyrics;
+      // path += "?apikey=b46b55Gk91lJS1IpOW8Qzr8v4dX3ThhwNcTArX9OzJiT8Q5qjTov0ucT";
 
-      let lyrPath = JSON.stringify(path);
-      window.localStorage.setItem("lyrPath", lyrPath);
+      let songID = arr[num].result.id;
+      lyrPath = baseURl + `/song/lyrics/?id=${songID}`;
+      saveInfo("lyrPath", lyrPath);
 
-      //songInfo
+      // songInfo
       // title
       saveInfo("songTitle", arr[num].track);
       saveInfo("artistName", arr[num].artist);
@@ -172,7 +170,6 @@ function saveInfo(name, input) {
   window.localStorage.setItem(name, info);
 }
 
-
 //------------------------------------------------------------------------------------------------------------------
 //--------------------------------------Song Timeline Exploration Section-------------------------------------------
 //------------------------------------------------------------------------------------------------------------------
@@ -184,23 +181,15 @@ loadImg();
 
 async function loadImg() {
   for (let w = 0; w < musicT.length; w++) {
-    let store = await fetchSong(keywords[w]);
-    musicT[w].children[1].children[0].children[0].setAttribute("src", store.result[2].cover);
+    let store = await fetchSong(keywords[w], 1);
+    let thisSong = store.hits[0];
+    musicT[w].children[1].children[0].children[0].setAttribute("src", thisSong.result.header_image_thumbnail_url);
     let press = document.createElement('div');
     press.innerHTML = `<button class ="cardBtn" onclick="listenForHistoryPlay(${w})">Play</button>`;
     musicT[w].children[1].children[1].append(press);
 
-    playListInfo.push(store.result[2].track + " " + store.result[2].artist);
+    playListInfo.push(thisSong.result.title + " " + thisSong.result.artist_names);
   }
-}
-
-//api for basic info stuff
-async function fetchSong(value) {
-  let timeLineApi = `https://api.happi.dev/v1/music?q=${value}&limit=&apikey=b46b55Gk91lJS1IpOW8Qzr8v4dX3ThhwNcTArX9OzJiT8Q5qjTov0ucT&type=:type&lyrics=1
-`;
-  let tResult = await fetch(timeLineApi);
-  const timeLineSongJson = await tResult.json();
-  return timeLineSongJson;
 }
 
 //getting youtube video, returns the link
@@ -212,11 +201,16 @@ async function videoLoad(counter) {
       'X-RapidAPI-Host': 'ytube-videos.p.rapidapi.com'
     }
   };
-  let result = await fetch(`https://ytube-videos.p.rapidapi.com/search-video?q=${playListInfo[counter]}`, options);
-  const ytJson = await result.json();
-  const ytLink = await ytJson[0].link;
-  finytLink = ytLink.replace('watch?v=', "embed/");
-  return finytLink;
+  try{
+    let result = await fetch(`https://ytube-videos.p.rapidapi.com/search-video?q=${playListInfo[counter]}`, options);
+    const ytJson = await result.json();
+    const ytLink = await ytJson[0].link;
+    finytLink = ytLink.replace('watch?v=', "embed/");
+    return finytLink;
+  }catch{
+    console.error(error);
+  }
+  
 }
 
 //play music
@@ -231,6 +225,7 @@ async function listenForHistoryPlay(m) {
     musicT[y].children[1].children[0].children[0].style.filter = "grayscale(70%)";
   } musicT[m].children[1].children[0].children[0].style.filter = "grayscale(0%)";
 }
+
 
 
 //------------------------------------------------------------------------------------------------------------------
