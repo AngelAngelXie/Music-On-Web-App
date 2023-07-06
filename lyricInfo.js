@@ -60,23 +60,25 @@ getInfo();
 // //------------------------------------------------------------------------------------------------------------------
 //getting youtube video
 async function ytResult() {
+  const vidUrl = `https://youtube138.p.rapidapi.com/search/?q=${searchKey}=en&gl=US`;
   const opts = {
     method: 'GET',
     headers: {
-      'X-RapidAPI-Key': '37749dd7e3msh939061c0790b14ap12fd49jsnf4e036dcb678',
-      'X-RapidAPI-Host': 'ytube-videos.p.rapidapi.com'
+      'X-RapidAPI-Key': 'c6a644ac67mshf2a9ee8378a98fdp1048d3jsn58314285c447',
+      'X-RapidAPI-Host': 'youtube138.p.rapidapi.com'
     }
   };
-  try{
-    let result = await fetch(`https://ytube-videos.p.rapidapi.com/search-video?q=${searchKey}`, opts);
+
+  try {
+    let result = await fetch(vidUrl, opts);
     const ytJson = await result.json();
-    const ytLink = await ytJson[0].link;
-    vidId = ytJson[0].id
-    newYtLink = ytLink.replace('watch?v=', "embed/");
-  } catch (error){
+    const arr = ytJson.contents;
+    vidId = arr[0].video.videoId;
+    newYtLink = `https://www.youtube.com/embed/${vidId}`;
+  } catch (error) {
     console.error(error);
   }
-  
+
 }
 ytResult();
 
