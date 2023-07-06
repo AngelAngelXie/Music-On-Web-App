@@ -4,5 +4,5 @@
 
 Built by Angel Xie, Kirsten Szeto, & Bryce Davis
 
-This is a web application that allows users to search, play, and like music. Technologies used includes Youtube API, Bulma, Javascript, HTML, and CSS. Concepts applied include working with APIs, parsing JSON objects, using web local memory storage, and web development langauges.
+This is a web application that allows users to search, play, and like music. Technologies used includes Youtube API, Genius API, Bulma, Javascript, HTML, and CSS. Concepts applied include working with APIs, parsing JSON objects, using web local storage, and web development langauges.
 
