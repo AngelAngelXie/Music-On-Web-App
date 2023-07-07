@@ -66,7 +66,7 @@ function displayHistory() {
         historyDiv.classList.add("search-history-item");
         historyDiv.setAttribute('id', `${history[i].id}`);
         historyDiv.innerHTML = `
-          <i class="fa fa-times" aria-hidden="true" onclick="deleteMemo('${history[i].id}')"></i>
+          <i class="fa fa-times cross" aria-hidden="true" onclick="deleteMemo('${history[i].id}')"></i>
           <p onclick="searchAgain('${history[i].term}')">${history[i].term}</p>
         `;
         searchHistory.append(historyDiv);
